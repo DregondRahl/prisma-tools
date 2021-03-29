@@ -76,9 +76,15 @@ export interface Options {
   output: string;
   javaScript?: boolean;
   excludeFields: string[];
-  excludeModels: { name: string; queries?: boolean; mutations?: boolean }[];
+  excludeModels: {
+    name: string;
+    queries?: boolean;
+    mutations?: boolean;
+    subscriptions?: boolean;
+  }[];
   disableQueries?: boolean;
   disableMutations?: boolean;
+  disableSubscriptions?: boolean;
   excludeFieldsByModel: { [modelName: string]: string[] };
   onDelete?: boolean;
   excludeQueriesAndMutationsByModel: {
@@ -93,6 +99,7 @@ export type Query =
   | 'findFirst'
   | 'findMany'
   | 'findCount'
+  | 'findPagination'
   | 'aggregate';
 export type Mutation =
   | 'createOne'
@@ -101,8 +108,9 @@ export type Mutation =
   | 'deleteOne'
   | 'updateMany'
   | 'deleteMany';
+export type Subscription = 'sync';
 
-export type QueriesAndMutations = Query | Mutation;
+export type QueriesAndMutations = Query | Mutation | Subscription;
 
 export interface AdminPagesOptions {
   models?: string[];

@@ -1,3 +1,4 @@
+import findPagination from './findPagination';
 import findUnique from './findUnique';
 import findFirst from './findFirst';
 import findMany from './findMany';
@@ -9,9 +10,11 @@ import upsertOne from './upsertOne';
 import deleteMany from './deleteMany';
 import updateMany from './updateMany';
 import aggregate from './aggregate';
+import sync from './sync';
 import { QueriesAndMutations } from '@paljs/types';
 
 const crud: { [key in QueriesAndMutations]: string } = {
+  findPagination,
   findUnique,
   findFirst,
   findMany,
@@ -23,6 +26,7 @@ const crud: { [key in QueriesAndMutations]: string } = {
   deleteMany,
   updateMany,
   aggregate,
+  sync,
 };
 
 function capital(name: string) {
@@ -31,7 +35,7 @@ function capital(name: string) {
 
 export function getCrud(
   model: string,
-  type: 'query' | 'mutation',
+  type: 'query' | 'mutation' | 'subscription',
   key: QueriesAndMutations,
   onDelete?: boolean,
   isJS?: boolean,
@@ -43,12 +47,15 @@ export function getCrud(
   }
   function getImportArgs() {
     switch (key) {
+      case 'sync':
       case 'aggregate':
       case 'findFirst':
         return ', list';
       case 'findCount':
       case 'findMany':
         return ', nonNull, list';
+      case 'findPagination':
+        return ', objectType, nonNull, list';
       case 'findUnique':
       case 'deleteOne':
       case 'deleteMany':
@@ -63,7 +70,11 @@ export function getCrud(
   const modelUpper = capital(model);
   const importString = getImport(
     `{ ${
-      type === 'query' ? 'queryField' : 'mutationField'
+      type === 'query'
+        ? 'queryField'
+        : type === 'mutation'
+        ? 'mutationField'
+        : 'subscriptionField'
     }${getImportArgs()} }`,
     'nexus',
   );

@@ -1,4 +1,4 @@
-import { Mutation, Options, Query } from '@paljs/types';
+import { Mutation, Options, Query, Subscription } from '@paljs/types';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { format, Options as PrettierOptions } from 'prettier';
 import pkgDir from 'pkg-dir';
@@ -20,6 +20,7 @@ export class Generators {
   protected isJS?: boolean = false;
 
   protected queries: Query[] = [
+    'findPagination',
     'findUnique',
     'findFirst',
     'findMany',
@@ -34,6 +35,8 @@ export class Generators {
     'updateMany',
     'deleteMany',
   ];
+
+  protected subscriptions: Subscription[] = ['sync'];
 
   constructor(private schemaPath: string, customOptions?: Partial<Options>) {
     this.options = { ...this.options, ...customOptions };
@@ -90,6 +93,15 @@ export class Generators {
       this.options.disableMutations ||
       !!this.options.excludeModels.find(
         (item) => item.name === model && item.mutations,
+      )
+    );
+  }
+
+  protected disableSubscriptions(model: string) {
+    return (
+      this.options.disableSubscriptions ||
+      !!this.options.excludeModels.find(
+        (item) => item.name === model && item.subscriptions,
       )
     );
   }

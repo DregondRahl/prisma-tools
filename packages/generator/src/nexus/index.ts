@@ -142,6 +142,35 @@ export class GenerateNexus extends Generators {
         );
       }
     }
+
+    if (!this.disableSubscriptions(name)) {
+      const subscriptionsIndex: string[] = [];
+      const path = this.output(name, 'subscriptions');
+      this.subscriptions
+        .filter((item) => !exclude.includes(item))
+        .map((item) => {
+          const itemContent = getCrud(
+            name,
+            'subscription',
+            item,
+            this.options.onDelete,
+            this.isJS,
+          );
+          this.createFileIfNotfound(
+            path,
+            this.withExtension(item),
+            this.formation(itemContent),
+          );
+          subscriptionsIndex.push(item);
+        });
+      if (subscriptionsIndex) {
+        modelIndex.push('subscriptions');
+        writeFileSync(
+          join(path, this.withExtension('index')),
+          this.formation(this.getIndexContent(subscriptionsIndex)),
+        );
+      }
+    }
     return modelIndex;
   }
 
